@@ -1,32 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzers/UI/bloc/quiz_bloc.dart';
 import 'package:quizzers/UI/model/question_ui_model.dart';
-import 'package:quizzers/UI/widgets/question_widget.dart';
-
-// TODO: Remove. Temp mock data
-List<QuestionUIModel> questions = [
-  const QuestionUIModel(
-    question: 'What is the capital of France?',
-    answers: [
-      AnswerUIModel(answer: 'Paris'),
-      AnswerUIModel(answer: 'London'),
-      AnswerUIModel(answer: 'Berlin'),
-      AnswerUIModel(answer: 'Madrid'),
-    ],
-    correctAnswerIndex: 0,
-    selectedAnswerIndex: null,
-  ),
-  const QuestionUIModel(
-    question: 'Who painted the Mona Lisa?',
-    answers: [
-      AnswerUIModel(answer: 'Leonardo da Vinci'),
-      AnswerUIModel(answer: 'Pablo Picasso'),
-      AnswerUIModel(answer: 'Vincent van Gogh'),
-      AnswerUIModel(answer: 'Michelangelo'),
-    ],
-    correctAnswerIndex: 0,
-    selectedAnswerIndex: null,
-  ),
-];
+import 'package:quizzers/UI/widgets/questions_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -37,16 +13,24 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Quizz App'),
       ),
-      body: ListView.builder(
-        itemCount: questions.length,
-        itemBuilder: (context, index) {
-          final question = questions[index];
-          return QuestionWidget(
-              question: question,
-              onSelected: (question) {
-                // TODO: handle on question selected,
-              });
-        },
+      body: BlocProvider(
+        create: (context) => QuizBloc()
+          ..add(
+            const QuizEvent.loadQuestions(),
+          ),
+        child: BlocBuilder<QuizBloc, QuizState>(
+          builder: (context, state) => state.status.when(
+            initial: () => const _EntryWidget(),
+            loading: () => const _LoadingWidget(),
+            loaded: () => state.questions == null
+                ? const _LoadingWidget()
+                : _LoadedWidget(
+                    questions: state.questions!,
+                  ),
+            error: () => const _ErrorWidget(),
+            submitted: () => const _SubmittedWidget(),
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -57,5 +41,59 @@ class HomePage extends StatelessWidget {
         child: const Icon(Icons.send),
       ),
     );
+  }
+}
+
+class _EntryWidget extends StatelessWidget {
+  const _EntryWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Entry Widget'));
+  }
+}
+
+class _LoadingWidget extends StatelessWidget {
+  const _LoadingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+}
+
+class _LoadedWidget extends StatelessWidget {
+  const _LoadedWidget({super.key, required this.questions});
+
+  final List<QuestionUIModel> questions;
+
+  @override
+  Widget build(BuildContext context) {
+    return QuestionsList(
+      questions: questions,
+      onSelected: (question) {
+        context.read<QuizBloc>().add(QuizEvent.answerSelected(question));
+      },
+    );
+  }
+}
+
+class _ErrorWidget extends StatelessWidget {
+  const _ErrorWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Error Widget'));
+  }
+}
+
+class _SubmittedWidget extends StatelessWidget {
+  const _SubmittedWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Submitted Widget'));
   }
 }
