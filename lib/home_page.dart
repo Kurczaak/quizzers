@@ -1,13 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:quizzers/UI/model/question_ui_model.dart';
+import 'package:quizzers/UI/widgets/question_widget.dart';
 
-class HomePage extends HookWidget {
+// TODO: Remove. Temp mock data
+List<QuestionUIModel> questions = [
+  const QuestionUIModel(
+    question: 'What is the capital of France?',
+    answers: [
+      AnswerUIModel(answer: 'Paris'),
+      AnswerUIModel(answer: 'London'),
+      AnswerUIModel(answer: 'Berlin'),
+      AnswerUIModel(answer: 'Madrid'),
+    ],
+    correctAnswerIndex: 0,
+    selectedAnswerIndex: null,
+  ),
+  const QuestionUIModel(
+    question: 'Who painted the Mona Lisa?',
+    answers: [
+      AnswerUIModel(answer: 'Leonardo da Vinci'),
+      AnswerUIModel(answer: 'Pablo Picasso'),
+      AnswerUIModel(answer: 'Vincent van Gogh'),
+      AnswerUIModel(answer: 'Michelangelo'),
+    ],
+    correctAnswerIndex: 0,
+    selectedAnswerIndex: null,
+  ),
+];
+
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final selectedAnswer =
-        useState<List<String?>>(List.filled(questions.length, null));
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quizz App'),
@@ -15,23 +40,12 @@ class HomePage extends HookWidget {
       body: ListView.builder(
         itemCount: questions.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(questions[index].question),
-            subtitle: Column(
-              children: questions[index].answers.map((answer) {
-                return RadioListTile(
-                  title: Text(answer),
-                  value: answer,
-                  groupValue: selectedAnswer.value[index],
-                  onChanged: (value) {
-                    // Update the selected answer for the current question
-                    selectedAnswer.value = List.from(selectedAnswer.value)
-                      ..[index] = value;
-                  },
-                );
-              }).toList(),
-            ),
-          );
+          final question = questions[index];
+          return QuestionWidget(
+              question: question,
+              onSelected: (question) {
+                // TODO: handle on question selected,
+              });
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -45,32 +59,3 @@ class HomePage extends HookWidget {
     );
   }
 }
-
-class Question {
-  final String question;
-  final List<String> answers;
-
-  Question({required this.question, required this.answers});
-}
-
-final List<Question> questions = [
-  Question(
-    question: 'What is the capital of France?',
-    answers: ['Paris', 'London', 'Berlin', 'Madrid'],
-  ),
-  Question(
-    question: 'What is the largest planet in our solar system?',
-    answers: ['Jupiter', 'Saturn', 'Mars', 'Earth'],
-  ),
-  Question(
-    question: 'Who painted the Mona Lisa?',
-    answers: [
-      'Leonardo da Vinci',
-      'Pablo Picasso',
-      'Vincent van Gogh',
-      'Michelangelo'
-    ],
-  ),
-];
-
-List<String> selectedAnswer = List.filled(questions.length, '');
