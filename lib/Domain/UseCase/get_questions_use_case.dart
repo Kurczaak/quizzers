@@ -1,14 +1,21 @@
 import 'package:dartz/dartz.dart';
 import 'package:quizzers/Domain/Entity/question.dart';
 import 'package:quizzers/Domain/Failure/quizzer_failure.dart';
+import 'package:quizzers/domain/repositories/quiz_repository.dart';
 
 class GetQuestionsUseCase {
+  final QuizRepository _quizRepository;
+
+  GetQuestionsUseCase({required QuizRepository quizRepository})
+      : _quizRepository = quizRepository;
   Future<Either<QuizzerFailure, List<Question>>> getQuestions(
     final String category,
     final String difficulty,
     final int numberOfQuestions,
-  ) async {
-    // TODO : Implement the getQuestions method
-    return const Left(QuizzerFailure.unknownError());
-  }
+  ) =>
+      _quizRepository.getQuizzQuestions(
+        category: category,
+        difficulty: difficulty,
+        numberOfQuestions: numberOfQuestions,
+      );
 }
