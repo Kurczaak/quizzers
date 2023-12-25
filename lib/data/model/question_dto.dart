@@ -11,7 +11,7 @@ class QuestionDTO {
   QuestionDTO(this.question, this.answers, this.correctAnswerIndex);
 
   factory QuestionDTO.fromJson(Map<String, dynamic> json) =>
-      _$QuestionDtoFromJson(json);
+      _$QuestionDTOFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuestionDtoToJson(this);
+  Map<String, dynamic> toJson() => _$QuestionDTOToJson(this);
 }
