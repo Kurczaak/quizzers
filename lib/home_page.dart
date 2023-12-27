@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzers/UI/bloc/quiz_bloc.dart';
 import 'package:quizzers/UI/model/question_ui_model.dart';
 import 'package:quizzers/UI/widgets/questions_list.dart';
+import 'package:quizzers/di/injection.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,10 +15,8 @@ class HomePage extends StatelessWidget {
         title: const Text('Quizz App'),
       ),
       body: BlocProvider(
-        create: (context) => QuizBloc()
-          ..add(
-            const QuizEvent.loadQuestions(),
-          ),
+        create: (context) =>
+            getIt<QuizBloc>()..add(const QuizEvent.loadQuestions()),
         child: BlocBuilder<QuizBloc, QuizState>(
           builder: (context, state) => state.status.when(
             initial: () => const _EntryWidget(),

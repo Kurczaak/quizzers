@@ -3,14 +3,17 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:injectable/injectable.dart';
 import 'package:quizzers/UI/model/question_ui_model.dart';
+import 'package:quizzers/domain/UseCase/get_questions_use_case.dart';
 
 part 'quiz_bloc.freezed.dart';
 part 'quiz_event.dart';
 part 'quiz_state.dart';
 
+@Injectable()
 class QuizBloc extends Bloc<QuizEvent, QuizState> {
-  QuizBloc()
+  QuizBloc(this._getQuestionsUseCase)
       : super(const QuizState(
           status: QuizStateStatus.initial(),
           questions: null,
@@ -25,16 +28,25 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     });
   }
 
+  final GetQuestionsUseCase _getQuestionsUseCase;
+
   void _onSubmit(Submit event, Emitter emit) {
     emit(state.copyWith(status: const QuizStateStatus.submitted()));
   }
 
   Future<void> _onLoadQuestions(LoadQuestions event, Emitter emit) async {
-    final questions = mockQuestions;
-    emit(state.copyWith(
-      status: const QuizStateStatus.loaded(),
-      questions: questions,
-    ));
+    final result =
+        await _getQuestionsUseCase.getQuestions('category', 'low', 2);
+
+    emit(
+      result.fold(
+        (l) => state.copyWith(status: const QuizStateStatus.error()),
+        (r) => state.copyWith(
+          status: const QuizStateStatus.loaded(),
+          questions: r.map((e) => e.toUIModel()).toList(),
+        ),
+      ),
+    );
   }
 
   void _onAnswerSelected(AnswerSelected event, Emitter emit) {

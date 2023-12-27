@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:injectable/injectable.dart';
 import 'package:quizzers/data/client/open_ai_client.dart';
 import 'package:quizzers/data/data_source/remote/quiz_remote_data_source.dart';
 import 'package:quizzers/data/model/question_dto.dart';
 import 'package:quizzers/util/string_extensions.dart';
 
+@Injectable(as: QuizRemoteDataSource)
 class QuizRemoteDataSourceOpenAIImpl implements QuizRemoteDataSource {
   QuizRemoteDataSourceOpenAIImpl({required this.client});
 

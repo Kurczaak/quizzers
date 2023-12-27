@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:quizzers/di/injection.config.dart';
+import 'package:quizzers/di/injection.dart';
 import 'package:quizzers/home_page.dart';
 
 void main() {
+  getIt.init();
   runApp(const MyApp());
 }
 
