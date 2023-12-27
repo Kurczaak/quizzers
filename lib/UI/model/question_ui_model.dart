@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:quizzers/Domain/Entity/question.dart';
 
 part 'question_ui_model.freezed.dart';
 
@@ -27,4 +28,13 @@ abstract class AnswerUIModel with _$AnswerUIModel {
   const factory AnswerUIModel({
     required String answer,
   }) = _AnswerUIModel;
+}
+
+extension QuestionX on Question {
+  QuestionUIModel toUIModel() => QuestionUIModel(
+        question: question,
+        answers: answers.map((e) => AnswerUIModel(answer: e.answer)).toList(),
+        correctAnswerIndex: correctAnswerIndex,
+        selectedAnswerIndex: null,
+      );
 }
