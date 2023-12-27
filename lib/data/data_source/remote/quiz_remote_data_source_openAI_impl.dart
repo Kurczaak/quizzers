@@ -16,12 +16,16 @@ class QuizRemoteDataSourceOpenAIImpl implements QuizRemoteDataSource {
     required String difficulty,
     required int numberOfQuestions,
   }) async {
+    final quizPrompt = QuizPrompt(
+        category: category,
+        difficulty: difficulty,
+        numberOfQuestions: numberOfQuestions);
     final response = await client.getJsonResponse(RequestBody(
       model: GptModel.gpt35Turbo,
       responseFormat: ResponseFormat(type: ResponseFormatType.json),
       messages: [
-        Message(role: Role.system, content: ''),
-        Message(role: Role.user, content: '')
+        Message(role: Role.system, content: quizPrompt.systemContent),
+        Message(role: Role.user, content: quizPrompt.userContent),
       ],
     ));
 
