@@ -20,7 +20,11 @@ class QuestionDTO {
   final List<String> answers;
   final int correctAnswerIndex;
 
-  QuestionDTO(this.question, this.answers, this.correctAnswerIndex);
+  QuestionDTO({
+    required this.question,
+    required this.answers,
+    required this.correctAnswerIndex,
+  });
 
   factory QuestionDTO.fromJson(Map<String, dynamic> json) =>
       _$QuestionDTOFromJson(json);
