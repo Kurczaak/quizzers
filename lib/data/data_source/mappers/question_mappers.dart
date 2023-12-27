@@ -1,8 +1,8 @@
 import 'package:quizzers/Domain/Entity/question.dart';
 import 'package:quizzers/data/model/question_dto.dart';
 
-extension QuestionDTOListMapperX on List<QuestionDTO> {
-  List<Question> toDomain() => map((e) => e.toDomain()).toList();
+extension QuestionDTOListMapperX on QuestionListDTO {
+  List<Question> toDomain() => questions.map((e) => e.toDomain()).toList();
 }
 
 extension QuestionDTOMapperX on QuestionDTO {
