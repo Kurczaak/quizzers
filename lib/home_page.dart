@@ -29,14 +29,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO:
-          // Handle the "Send" button press
-          // You can access the selected answers using the selectedAnswer list
-        },
-        child: const Icon(Icons.send),
-      ),
     );
   }
 }
@@ -70,12 +62,24 @@ class _LoadedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return QuestionsList(
-      showIsCorrect: showAnswers,
-      questions: questions,
-      onSelected: (question) {
-        context.read<QuizBloc>().add(QuizEvent.answerSelected(question));
-      },
+    return Column(
+      children: [
+        Expanded(
+          child: QuestionsList(
+            showIsCorrect: showAnswers,
+            questions: questions,
+            onSelected: (question) {
+              context.read<QuizBloc>().add(QuizEvent.answerSelected(question));
+            },
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            context.read<QuizBloc>().add(const QuizEvent.submit());
+          },
+          child: const Text('Submit'), // TODO extract to l10n
+        ),
+      ],
     );
   }
 }
