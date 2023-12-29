@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quizzers/UI/model/question_ui_model.dart';
+import 'package:quizzers/presentation/model/question_ui_model.dart';
 
 class QuestionWidget extends StatelessWidget {
   const QuestionWidget({

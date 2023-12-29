@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quizzers/UI/model/question_ui_model.dart';
-import 'package:quizzers/UI/widgets/question_widget.dart';
+import 'package:quizzers/presentation/model/question_ui_model.dart';
+import 'package:quizzers/presentation/widgets/question_widget.dart';
 
 class QuestionsList extends StatelessWidget {
   const QuestionsList(
