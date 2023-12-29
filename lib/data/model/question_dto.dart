@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'question_dto.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class QuestionListDTO {
   final List<QuestionDTO> questions;
 
@@ -14,7 +14,7 @@ class QuestionListDTO {
   Map<String, dynamic> toJson() => _$QuestionListDTOToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class QuestionDTO {
   final String question;
   final List<String> answers;
