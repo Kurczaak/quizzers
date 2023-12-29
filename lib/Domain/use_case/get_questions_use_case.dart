@@ -10,14 +10,16 @@ class GetQuestionsUseCase {
 
   GetQuestionsUseCase({required QuizRepository quizRepository})
       : _quizRepository = quizRepository;
-  Future<Either<QuizzerFailure, List<Question>>> getQuestions(
-    final String category,
-    final String difficulty,
-    final int numberOfQuestions,
-  ) =>
+  Future<Either<QuizzerFailure, List<Question>>> getQuestions({
+    required String category,
+    required String difficulty,
+    required int questionsCount,
+    required int answersCount,
+  }) =>
       _quizRepository.getQuizzQuestions(
         category: category,
         difficulty: difficulty,
-        numberOfQuestions: numberOfQuestions,
+        questionsCount: questionsCount,
+        answersCount: answersCount,
       );
 }
