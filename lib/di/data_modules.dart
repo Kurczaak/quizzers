@@ -7,7 +7,7 @@ import 'package:quizzers/data/client/open_ai_client.dart';
 abstract class RetrofitInjectableModule {
   @LazySingleton()
   Dio get dio {
-    final apiKey = dotenv.env['API_KEY'];
+    final apiKey = dotenv.get('API_KEY');
     return Dio(
       BaseOptions(
         headers: {'authorization': 'Bearer $apiKey'},
