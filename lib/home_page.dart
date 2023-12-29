@@ -15,11 +15,12 @@ class HomePage extends StatelessWidget {
         title: const Text('Quizz App'),
       ),
       body: BlocProvider(
-        create: (context) =>
-            getIt<QuizBloc>()..add(const QuizEvent.loadQuestions()),
+        create: (context) => getIt<QuizBloc>(),
         child: BlocBuilder<QuizBloc, QuizState>(
           builder: (context, state) => state.map(
-            initial: (_) => const _EntryWidget(),
+            initial: (state) => _EntryWidget(
+              difficulty: state.difficulty,
+            ),
             loading: (_) => const _LoadingWidget(),
             loaded: (state) => _LoadedWidget(
               questions: state.questions,
@@ -34,11 +35,45 @@ class HomePage extends StatelessWidget {
 }
 
 class _EntryWidget extends StatelessWidget {
-  const _EntryWidget({super.key});
+  const _EntryWidget({
+    super.key,
+    required this.difficulty,
+  });
+
+  final QuestionDifficulty difficulty;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Entry Widget'));
+    return Column(
+      children: [
+        const Text('Enter a category'),
+        TextField(
+          onChanged: (value) {
+            context.read<QuizBloc>().add(QuizEvent.changeCategory(value));
+          },
+        ),
+        const Text('Select difficulty'),
+        DropdownButton<QuestionDifficulty>(
+          value: context.select((QuizBloc bloc) => difficulty),
+          onChanged: (value) {
+            context.read<QuizBloc>().add(
+                QuizEvent.difficultyChanged(value ?? QuestionDifficulty.easy));
+          },
+          items: QuestionDifficulty.values
+              .map((e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(e.name),
+                  ))
+              .toList(),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            context.read<QuizBloc>().add(const QuizEvent.loadQuestions());
+          },
+          child: const Text('Start'),
+        ),
+      ],
+    );
   }
 }
 
@@ -69,15 +104,19 @@ class _LoadedWidget extends StatelessWidget {
             showIsCorrect: showAnswers,
             questions: questions,
             onSelected: (question) {
-              context.read<QuizBloc>().add(QuizEvent.answerSelected(question));
+              context.read<QuizBloc>().add(showAnswers
+                  ? const QuizEvent.reset()
+                  : QuizEvent.answerSelected(question));
             },
           ),
         ),
         ElevatedButton(
           onPressed: () {
-            context.read<QuizBloc>().add(const QuizEvent.submit());
+            showAnswers
+                ? context.read<QuizBloc>().add(const QuizEvent.reset())
+                : context.read<QuizBloc>().add(const QuizEvent.submit());
           },
-          child: const Text('Submit'), // TODO extract to l10n
+          child: Text(showAnswers ? 'Reset' : 'Submit'), // TODO extract to l10n
         ),
       ],
     );
