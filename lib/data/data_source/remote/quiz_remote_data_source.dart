@@ -4,6 +4,7 @@ abstract class QuizRemoteDataSource {
   Future<QuestionListDTO> getQuizzQuestions({
     required final String category,
     required final String difficulty,
-    required final int numberOfQuestions,
+    required final int questionsCount,
+    required final int answersCount,
   });
 }

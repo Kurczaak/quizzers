@@ -14,15 +14,18 @@ class QuizzRepositoryGPTImpl implements QuizRepository {
   final QuizRemoteDataSource _quizRemoteDataSource;
 
   @override
-  Future<Either<QuizzerFailure, List<Question>>> getQuizzQuestions(
-      {required String category,
-      required String difficulty,
-      required int numberOfQuestions}) async {
+  Future<Either<QuizzerFailure, List<Question>>> getQuizzQuestions({
+    required String category,
+    required String difficulty,
+    required int questionsCount,
+    required int answersCount,
+  }) async {
     try {
       final result = await _quizRemoteDataSource.getQuizzQuestions(
           category: category,
           difficulty: difficulty,
-          numberOfQuestions: numberOfQuestions);
+          questionsCount: questionsCount,
+          answersCount: answersCount);
       return Right(result.toDomain());
     } catch (e) {
       // TODO implement exception handling

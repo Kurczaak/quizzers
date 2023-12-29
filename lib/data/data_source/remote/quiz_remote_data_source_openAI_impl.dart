@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:quizzers/data/client/open_ai_client.dart';
 import 'package:quizzers/data/data_source/remote/quiz_remote_data_source.dart';
 import 'package:quizzers/data/model/question_dto.dart';
+import 'package:quizzers/data/request/open_ai_client_request.dart';
 import 'package:quizzers/util/string_extensions.dart';
 
 @Injectable(as: QuizRemoteDataSource)
@@ -16,12 +17,15 @@ class QuizRemoteDataSourceOpenAIImpl implements QuizRemoteDataSource {
   Future<QuestionListDTO> getQuizzQuestions({
     required String category,
     required String difficulty,
-    required int numberOfQuestions,
+    required int questionsCount,
+    required int answersCount,
   }) async {
     final quizPrompt = QuizPrompt(
-        category: category,
-        difficulty: difficulty,
-        numberOfQuestions: numberOfQuestions);
+      category: category,
+      difficulty: difficulty,
+      questionsCount: questionsCount,
+      answersCount: answersCount,
+    );
     final response = await client.getJsonResponse(RequestBody(
       model: GptModel.gpt35Turbo,
       responseFormat: ResponseFormat(type: ResponseFormatType.json),
@@ -33,7 +37,7 @@ class QuizRemoteDataSourceOpenAIImpl implements QuizRemoteDataSource {
 
     final firstChoice = response.choices.firstOrNull;
     if (firstChoice == null) {
-      throw Exception('No choice available'); // TODO: refactor
+      throw Exception('No choice available');
     }
 
     final jsonContent = jsonDecode(firstChoice.message.content);
@@ -45,7 +49,8 @@ class QuizRemoteDataSourceOpenAIImpl implements QuizRemoteDataSource {
 class QuizPrompt extends Prompt {
   final String category;
   final String difficulty;
-  final int numberOfQuestions;
+  final int questionsCount;
+  final int answersCount;
 
   static final _jsonTemplateFormat = QuestionListDTO(
     questions: [
@@ -56,28 +61,32 @@ class QuizPrompt extends Prompt {
       )
     ],
   ).toJson();
+
   static const _questionsCountParam = 'questionsCount';
+  static const _answersCountParam = 'answersCount';
   static const _categoryParam = 'category';
   static const _difficultyParam = 'difficulty';
 
-  static const _adoptPersonaPrompt = 'You are a quizz generator.';
+  static const _adoptPersonaPrompt = 'You are a quiz generator.';
   static final _jsonTemplatePrompt =
       'Output JSON format: $_jsonTemplateFormat.';
 
   static const _questionGenerationPrompt =
-      'Generate {$_questionsCountParam} questions on {$_categoryParam} with {$_difficultyParam} difficulty.';
+      'Generate {$_questionsCountParam} questions on {$_categoryParam} with {$_difficultyParam} difficulty. Each question have {$_answersCountParam} answers.';
 
   QuizPrompt({
     required this.category,
     required this.difficulty,
-    required this.numberOfQuestions,
+    required this.questionsCount,
+    required this.answersCount,
   }) : super(
           systemContent: '$_adoptPersonaPrompt '
               '$_jsonTemplatePrompt',
           userContent: _questionGenerationPrompt.withParams({
-            _questionsCountParam: numberOfQuestions.toString(),
+            _questionsCountParam: questionsCount.toString(),
             _categoryParam: category,
             _difficultyParam: difficulty,
+            _answersCountParam: answersCount.toString(),
           }),
         );
 }
