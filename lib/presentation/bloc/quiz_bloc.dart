@@ -21,11 +21,33 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         answerSelected: (answerSelected) async =>
             _onAnswerSelected(answerSelected, emit),
         submit: (submit) async => _onSubmit(submit, emit),
+        changeCategory: (changeCategory) async =>
+            _onChangeCategory(changeCategory, emit),
+        difficultyChanged: (difficultyChanged) async =>
+            _onDifficultyChanged(difficultyChanged, emit),
+        reset: (reset) async => _onReset(reset, emit),
       );
     });
   }
 
   final GetQuestionsUseCase _getQuestionsUseCase;
+
+  void _onReset(Reset event, Emitter emit) {
+    emit(const QuizState.initial());
+  }
+
+  void _onDifficultyChanged(
+      DifficultyChanged event, Emitter<QuizState> emit) async {
+    state.mapOrNull(initial: (initial) {
+      emit(initial.copyWith(difficulty: event.difficulty));
+    });
+  }
+
+  void _onChangeCategory(ChangeCategory event, Emitter<QuizState> emit) async {
+    state.mapOrNull(initial: (initial) {
+      emit(initial.copyWith(category: event.category));
+    });
+  }
 
   void _onSubmit(Submit event, Emitter emit) {
     state.mapOrNull(loaded: (loaded) {
@@ -36,20 +58,22 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   }
 
   Future<void> _onLoadQuestions(LoadQuestions event, Emitter emit) async {
-    emit(const QuizState.loading());
+    await state.mapOrNull(initial: (initial) async {
+      emit(const QuizState.loading());
 
-    final result = await _getQuestionsUseCase.getQuestions(
-        category: 'general knowledge',
-        difficulty: 'easy',
-        questionsCount: 4,
-        answersCount: 4);
+      final result = await _getQuestionsUseCase.getQuestions(
+          category: initial.category,
+          difficulty: initial.difficulty.name,
+          questionsCount: 4,
+          answersCount: 4);
 
-    emit(
-      result.fold(
-          (l) => const QuizState.error(),
-          (r) => QuizState.loaded(
-              questions: r.map((e) => e.toUIModel()).toList())),
-    );
+      emit(
+        result.fold(
+            (l) => const QuizState.error(),
+            (r) => QuizState.loaded(
+                questions: r.map((e) => e.toUIModel()).toList())),
+      );
+    });
   }
 
   void _onAnswerSelected(AnswerSelected event, Emitter emit) {
