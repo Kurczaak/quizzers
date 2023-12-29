@@ -46,3 +46,6 @@ app.*.map.json
 *.g.dart
 *.freezed.dart
 *.config.dart
+
+# Environment variables
+.env
