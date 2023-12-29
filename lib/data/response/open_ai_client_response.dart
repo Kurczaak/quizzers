@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'open_ai_client_response.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class OpenAIClientResponse {
   final String id;
   final String object;
@@ -27,7 +27,7 @@ class OpenAIClientResponse {
   Map<String, dynamic> toJson() => _$OpenAIClientResponseToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Choice {
   final int index;
   final Message message;
@@ -45,7 +45,7 @@ class Choice {
   Map<String, dynamic> toJson() => _$ChoiceToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Message {
   final String role;
   final String content;
@@ -57,7 +57,7 @@ class Message {
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Usage {
   final int promptTokens;
   final int completionTokens;
