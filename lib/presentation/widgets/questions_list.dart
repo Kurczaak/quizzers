@@ -19,10 +19,13 @@ class QuestionsList extends StatelessWidget {
         itemCount: questions.length,
         itemBuilder: (context, index) {
           final question = questions[index];
-          return QuestionWidget(
-            question: question,
-            onSelected: onSelected,
-            showIsCorrect: showIsCorrect,
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: QuestionWidget(
+              question: question,
+              onSelected: onSelected,
+              showIsCorrect: showIsCorrect,
+            ),
           );
         });
   }
