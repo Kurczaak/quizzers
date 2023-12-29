@@ -45,3 +45,7 @@ app.*.map.json
 # Flutter
 *.g.dart
 *.freezed.dart
+*.config.dart
+
+# Environment variables
+.env

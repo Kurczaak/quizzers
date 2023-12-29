@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:quizzers/UI/bloc/quiz_bloc.dart';
-import 'package:quizzers/UI/model/question_ui_model.dart';
-import 'package:quizzers/UI/widgets/questions_list.dart';
+import 'package:quizzers/di/injection.dart';
+import 'package:quizzers/presentation/bloc/quiz_bloc.dart';
+import 'package:quizzers/presentation/model/question_ui_model.dart';
+import 'package:quizzers/presentation/widgets/questions_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,42 +15,65 @@ class HomePage extends StatelessWidget {
         title: const Text('Quizz App'),
       ),
       body: BlocProvider(
-        create: (context) => QuizBloc()
-          ..add(
-            const QuizEvent.loadQuestions(),
-          ),
+        create: (context) => getIt<QuizBloc>(),
         child: BlocBuilder<QuizBloc, QuizState>(
-          builder: (context, state) => state.status.when(
-            initial: () => const _EntryWidget(),
-            loading: () => const _LoadingWidget(),
-            loaded: () => state.questions == null
-                ? const _LoadingWidget()
-                : _LoadedWidget(
-                    questions: state.questions!,
-                  ),
-            error: () => const _ErrorWidget(),
-            submitted: () => const _SubmittedWidget(),
+          builder: (context, state) => state.map(
+            initial: (state) => _EntryWidget(
+              difficulty: state.difficulty,
+            ),
+            loading: (_) => const _LoadingWidget(),
+            loaded: (state) => _LoadedWidget(
+              questions: state.questions,
+              showAnswers: state.isSubmitted,
+            ),
+            error: (_) => const _ErrorWidget(),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO:
-          // Handle the "Send" button press
-          // You can access the selected answers using the selectedAnswer list
-        },
-        child: const Icon(Icons.send),
       ),
     );
   }
 }
 
 class _EntryWidget extends StatelessWidget {
-  const _EntryWidget({super.key});
+  const _EntryWidget({
+    super.key,
+    required this.difficulty,
+  });
+
+  final QuestionDifficulty difficulty;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Entry Widget'));
+    return Column(
+      children: [
+        const Text('Enter a category'),
+        TextField(
+          onChanged: (value) {
+            context.read<QuizBloc>().add(QuizEvent.changeCategory(value));
+          },
+        ),
+        const Text('Select difficulty'),
+        DropdownButton<QuestionDifficulty>(
+          value: context.select((QuizBloc bloc) => difficulty),
+          onChanged: (value) {
+            context.read<QuizBloc>().add(
+                QuizEvent.difficultyChanged(value ?? QuestionDifficulty.easy));
+          },
+          items: QuestionDifficulty.values
+              .map((e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(e.name),
+                  ))
+              .toList(),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            context.read<QuizBloc>().add(const QuizEvent.loadQuestions());
+          },
+          child: const Text('Start'),
+        ),
+      ],
+    );
   }
 }
 
@@ -65,17 +89,36 @@ class _LoadingWidget extends StatelessWidget {
 }
 
 class _LoadedWidget extends StatelessWidget {
-  const _LoadedWidget({super.key, required this.questions});
+  const _LoadedWidget(
+      {super.key, required this.questions, required this.showAnswers});
 
   final List<QuestionUIModel> questions;
+  final bool showAnswers;
 
   @override
   Widget build(BuildContext context) {
-    return QuestionsList(
-      questions: questions,
-      onSelected: (question) {
-        context.read<QuizBloc>().add(QuizEvent.answerSelected(question));
-      },
+    return Column(
+      children: [
+        Expanded(
+          child: QuestionsList(
+            showIsCorrect: showAnswers,
+            questions: questions,
+            onSelected: (question) {
+              context.read<QuizBloc>().add(showAnswers
+                  ? const QuizEvent.reset()
+                  : QuizEvent.answerSelected(question));
+            },
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            showAnswers
+                ? context.read<QuizBloc>().add(const QuizEvent.reset())
+                : context.read<QuizBloc>().add(const QuizEvent.submit());
+          },
+          child: Text(showAnswers ? 'Reset' : 'Submit'), // TODO extract to l10n
+        ),
+      ],
     );
   }
 }
@@ -86,14 +129,5 @@ class _ErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Error Widget'));
-  }
-}
-
-class _SubmittedWidget extends StatelessWidget {
-  const _SubmittedWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Submitted Widget'));
   }
 }
