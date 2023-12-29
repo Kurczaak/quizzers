@@ -6,14 +6,21 @@ class QuestionWidget extends StatelessWidget {
     super.key,
     required this.question,
     required this.onSelected,
+    required this.showIsCorrect,
   });
 
   final QuestionUIModel question;
   final void Function(QuestionUIModel question) onSelected;
+  final bool showIsCorrect;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      tileColor: showIsCorrect
+          ? question.isCorrectAnswered
+              ? Colors.green
+              : Colors.red
+          : null,
       title: Text(question.question),
       subtitle: Column(
         children: question.answers.map((answer) {

@@ -4,10 +4,14 @@ import 'package:quizzers/UI/widgets/question_widget.dart';
 
 class QuestionsList extends StatelessWidget {
   const QuestionsList(
-      {super.key, required this.questions, required this.onSelected});
+      {super.key,
+      required this.questions,
+      required this.onSelected,
+      required this.showIsCorrect});
 
   final List<QuestionUIModel> questions;
   final void Function(QuestionUIModel question) onSelected;
+  final bool showIsCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +22,7 @@ class QuestionsList extends StatelessWidget {
           return QuestionWidget(
             question: question,
             onSelected: onSelected,
+            showIsCorrect: showIsCorrect,
           );
         });
   }
