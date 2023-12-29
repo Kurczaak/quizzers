@@ -15,27 +15,38 @@ class QuestionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      tileColor: showIsCorrect
-          ? question.isCorrectAnswered
-              ? Colors.green
-              : Colors.red
-          : null,
-      title: Text(question.question),
-      subtitle: Column(
-        children: question.answers.map((answer) {
-          return _AnswerWidget(
-            answer: answer,
-            onSelected: (answer) {
-              onSelected(
-                question.copyWith(
-                  selectedAnswerIndex: question.answers.indexOf(answer),
-                ),
-              );
-            },
-            selectedAnswer: question.selectedAnswer,
-          );
-        }).toList(),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(
+          width: 4,
+          color: showIsCorrect
+              ? question.isCorrectAnswered
+                  ? Colors.green
+                  : Colors.red
+              : Colors.grey,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
+        title: Text(question.question),
+        subtitle: Column(
+          children: question.answers.map((answer) {
+            return _AnswerWidget(
+              answer: answer,
+              onSelected: (answer) {
+                if (showIsCorrect) return;
+                onSelected(
+                  question.copyWith(
+                    selectedAnswerIndex: question.answers.indexOf(answer),
+                  ),
+                );
+              },
+              selectedAnswer: question.selectedAnswer,
+              isCorrect: answer == question.correctAnswer,
+              showIsCorrect: showIsCorrect,
+            );
+          }).toList(),
+        ),
       ),
     );
   }
@@ -47,16 +58,23 @@ class _AnswerWidget extends StatelessWidget {
     required this.selectedAnswer,
     required this.answer,
     required this.onSelected,
+    required this.isCorrect,
+    required this.showIsCorrect,
   });
 
   final AnswerUIModel answer;
   final AnswerUIModel? selectedAnswer;
   final void Function(AnswerUIModel) onSelected;
+  final bool isCorrect;
+  final bool showIsCorrect;
 
   @override
   Widget build(BuildContext context) {
     return RadioListTile(
-      title: Text(answer.answer),
+      title: Text(
+        answer.answer,
+        style: TextStyle(color: _color),
+      ),
       value: answer,
       groupValue: selectedAnswer,
       onChanged: (value) {
@@ -64,4 +82,12 @@ class _AnswerWidget extends StatelessWidget {
       },
     );
   }
+
+  Color get _color => showIsCorrect
+      ? isCorrect
+          ? answer == selectedAnswer
+              ? Colors.green
+              : Colors.red
+          : Colors.black
+      : Colors.black;
 }
