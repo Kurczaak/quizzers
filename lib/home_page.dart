@@ -71,6 +71,7 @@ class _LoadedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return QuestionsList(
+      showIsCorrect: true,
       questions: questions,
       onSelected: (question) {
         context.read<QuizBloc>().add(QuizEvent.answerSelected(question));

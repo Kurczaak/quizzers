@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quizzers/UI/model/question_ui_model.dart';
-import 'package:quizzers/domain/UseCase/get_questions_use_case.dart';
+import 'package:quizzers/domain/use_case/get_questions_use_case.dart';
 
 part 'quiz_bloc.freezed.dart';
 part 'quiz_event.dart';
@@ -35,8 +35,11 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   }
 
   Future<void> _onLoadQuestions(LoadQuestions event, Emitter emit) async {
-    final result =
-        await _getQuestionsUseCase.getQuestions('category', 'low', 2);
+    final result = await _getQuestionsUseCase.getQuestions(
+        category: 'general knowledge',
+        difficulty: 'easy',
+        questionsCount: 4,
+        answersCount: 4);
 
     emit(
       result.fold(
