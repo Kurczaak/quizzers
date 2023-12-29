@@ -4,6 +4,7 @@ import 'package:quizzers/di/injection.dart';
 import 'package:quizzers/home_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   getIt.init();
   runApp(const MyApp());
 }
