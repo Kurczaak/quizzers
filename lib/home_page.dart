@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:quizzers/UI/bloc/quiz_bloc.dart';
-import 'package:quizzers/UI/model/question_ui_model.dart';
-import 'package:quizzers/UI/widgets/questions_list.dart';
 import 'package:quizzers/di/injection.dart';
+import 'package:quizzers/presentation/bloc/quiz_bloc.dart';
+import 'package:quizzers/presentation/model/question_ui_model.dart';
+import 'package:quizzers/presentation/widgets/questions_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,16 +18,14 @@ class HomePage extends StatelessWidget {
         create: (context) =>
             getIt<QuizBloc>()..add(const QuizEvent.loadQuestions()),
         child: BlocBuilder<QuizBloc, QuizState>(
-          builder: (context, state) => state.status.when(
-            initial: () => const _EntryWidget(),
-            loading: () => const _LoadingWidget(),
-            loaded: () => state.questions == null
-                ? const _LoadingWidget()
-                : _LoadedWidget(
-                    questions: state.questions!,
-                  ),
-            error: () => const _ErrorWidget(),
-            submitted: () => const _SubmittedWidget(),
+          builder: (context, state) => state.map(
+            initial: (_) => const _EntryWidget(),
+            loading: (_) => const _LoadingWidget(),
+            loaded: (state) => _LoadedWidget(
+              questions: state.questions,
+              showAnswers: state.isSubmitted,
+            ),
+            error: (_) => const _ErrorWidget(),
           ),
         ),
       ),
@@ -64,14 +62,16 @@ class _LoadingWidget extends StatelessWidget {
 }
 
 class _LoadedWidget extends StatelessWidget {
-  const _LoadedWidget({super.key, required this.questions});
+  const _LoadedWidget(
+      {super.key, required this.questions, required this.showAnswers});
 
   final List<QuestionUIModel> questions;
+  final bool showAnswers;
 
   @override
   Widget build(BuildContext context) {
     return QuestionsList(
-      showIsCorrect: true,
+      showIsCorrect: showAnswers,
       questions: questions,
       onSelected: (question) {
         context.read<QuizBloc>().add(QuizEvent.answerSelected(question));
