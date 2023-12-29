@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:quizzers/di/injection.config.dart';
 import 'package:quizzers/di/injection.dart';
 import 'package:quizzers/home_page.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   getIt.init();
   runApp(const MyApp());
 }
