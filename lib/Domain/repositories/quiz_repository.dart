@@ -6,6 +6,7 @@ abstract class QuizRepository {
   Future<Either<QuizzerFailure, List<Question>>> getQuizzQuestions({
     required final String category,
     required final String difficulty,
-    required final int numberOfQuestions,
+    required final int questionsCount,
+    required final int answersCount,
   });
 }
