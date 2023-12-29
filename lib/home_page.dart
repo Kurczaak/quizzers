@@ -92,12 +92,3 @@ class _ErrorWidget extends StatelessWidget {
     return const Center(child: Text('Error Widget'));
   }
 }
-
-class _SubmittedWidget extends StatelessWidget {
-  const _SubmittedWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Submitted Widget'));
-  }
-}
