@@ -44,35 +44,44 @@ class _EntryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('Enter a category'),
-        TextField(
-          onChanged: (value) {
-            context.read<QuizBloc>().add(QuizEvent.changeCategory(value));
-          },
-        ),
-        const Text('Select difficulty'),
-        DropdownButton<QuestionDifficulty>(
-          value: context.select((QuizBloc bloc) => difficulty),
-          onChanged: (value) {
-            context.read<QuizBloc>().add(
-                QuizEvent.difficultyChanged(value ?? QuestionDifficulty.easy));
-          },
-          items: QuestionDifficulty.values
-              .map((e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(e.name),
-                  ))
-              .toList(),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            context.read<QuizBloc>().add(const QuizEvent.loadQuestions());
-          },
-          child: const Text('Start'),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            decoration: const InputDecoration(
+              hintText: 'Enter your category here',
+            ),
+            onChanged: (value) {
+              context.read<QuizBloc>().add(QuizEvent.changeCategory(value));
+            },
+          ),
+          const SizedBox(height: 20),
+          const Text('Select difficulty'),
+          DropdownButton<QuestionDifficulty>(
+            value: context.select((QuizBloc bloc) => difficulty),
+            onChanged: (value) {
+              context.read<QuizBloc>().add(QuizEvent.difficultyChanged(
+                  value ?? QuestionDifficulty.easy));
+            },
+            items: QuestionDifficulty.values
+                .map((e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.name),
+                    ))
+                .toList(),
+          ),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                context.read<QuizBloc>().add(const QuizEvent.loadQuestions());
+              },
+              child: const Text('Start'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -118,6 +127,7 @@ class _LoadedWidget extends StatelessWidget {
           },
           child: Text(showAnswers ? 'Reset' : 'Submit'), // TODO extract to l10n
         ),
+        const SizedBox(height: 40),
       ],
     );
   }
